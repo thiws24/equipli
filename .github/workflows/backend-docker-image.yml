@@ -32,7 +32,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build the Maven artifact
+      - name: Build the Maven artifact iiservice
         working-directory: iiservice/
         run: ./mvnw package -Pprod -DskipTests
 
@@ -50,3 +50,18 @@ jobs:
         env:
           webhook_type: 'json'
           webhook_url: ${{ secrets.PORTAINER_II_WEBHOOK_URL }}
+
+
+      - name: Build the Maven artifact qr_service
+        working-directory: qr_service/
+        run: ./mvnw package -Pprod -DskipTests
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: qr_service/
+          file: qr_service/src/main/docker/Dockerfile.jvm
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/thiws24/qr_service:latest
+

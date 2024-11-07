@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:spiffworkflow="http://spiffworkflow.org/bpmn/schema/1.0/core" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1d2hcmz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:collaboration id="Collaboration_0g4wcq3">
+    <bpmn:participant id="Participant_0xfcgaf" name="Inventory Process" processRef="Inventory_Process_jwk3" />
+    <bpmn:textAnnotation id="TextAnnotation_1xkl9oj">
+      <bpmn:text>URN:String</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_057vkw6">
+      <bpmn:text>QR_code: pdf</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_17fdgod">
+      <bpmn:text>URN: String Name:String Icon: String Foto: String</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0grdw1i">
+      <bpmn:text>URN: String Name:String Icon: String    Foto: String</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1v6s2co" associationDirection="None" sourceRef="DataObjectReference_0a2dh50" targetRef="TextAnnotation_17fdgod" />
+    <bpmn:association id="Association_1kgce99" associationDirection="None" sourceRef="DataObjectReference_132lkqb" targetRef="TextAnnotation_0grdw1i" />
+    <bpmn:association id="Association_1t58e3g" associationDirection="None" sourceRef="DataObjectReference_1nrkvgd" targetRef="TextAnnotation_1xkl9oj" />
+  </bpmn:collaboration>
+  <bpmn:process id="Inventory_Process_jwk3" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_19smej8">
+      <bpmn:lane id="Lane_14jmm0k" name="Inventorymanagement_administrator">
+        <bpmn:flowNodeRef>Activity_18eseli</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_11xtiaq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1v65uss</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_00butrr</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0eot73d</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1h6buk5</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_1mhlckx" name="Microservices">
+        <bpmn:flowNodeRef>Activity_165ddj9</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0eto9sg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_05o2417</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1j23erl</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_020k34f</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0u9s1j2</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_04qn1ii" name="Database" />
+    </bpmn:laneSet>
+    <bpmn:dataObjectReference id="DataObjectReference_1ea6fho" name="List of used URN" dataObjectRef="DataObject_04i1stk" />
+    <bpmn:dataObject id="DataObject_04i1stk" />
+    <bpmn:dataObjectReference id="DataObjectReference_1nrkvgd" name="Object Data" dataObjectRef="DataObject_14ky4kv" />
+    <bpmn:dataObject id="DataObject_14ky4kv" />
+    <bpmn:dataObjectReference id="DataObjectReference_1wsqa0r" name="Label" dataObjectRef="DataObject_0i7nkfc" />
+    <bpmn:dataObject id="DataObject_0i7nkfc" />
+    <bpmn:dataObjectReference id="DataObjectReference_0a2dh50" name="Object Data" dataObjectRef="DataObject_0tl4ysw" />
+    <bpmn:dataObject id="DataObject_0tl4ysw" />
+    <bpmn:dataObjectReference id="DataObjectReference_132lkqb" name="Inventory Item" dataObjectRef="DataObject_0fvje75" />
+    <bpmn:dataObject id="DataObject_0fvje75" />
+    <bpmn:serviceTask id="Activity_165ddj9" name="Persist Data in DB">
+      <bpmn:extensionElements>
+        <spiffworkflow:serviceTaskOperator id="http/PostRequestV2" resultVariable="databaseresponse">
+          <spiffworkflow:parameters>
+            <spiffworkflow:parameter id="url" type="str" value="&#34;https://webhook.site/326876b2-84e2-4a19-8382-32ba19769fb5&#34;" />
+            <spiffworkflow:parameter id="headers" type="any" value="{&#34;Content-Type&#34;:&#34;application/json&#34;}" />
+            <spiffworkflow:parameter id="data" type="any" value="{ &#34;name&#34;: name, &#34;icon&#34;: icon, &#34;photo&#34;: photo, &#34;URN&#34;: URN }" />
+            <spiffworkflow:parameter id="basic_auth_username" type="str" />
+            <spiffworkflow:parameter id="basic_auth_password" type="str" />
+          </spiffworkflow:parameters>
+        </spiffworkflow:serviceTaskOperator>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12e61tl</bpmn:incoming>
+      <bpmn:outgoing>Flow_1niwuiu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_13fc6m4" sourceRef="Activity_11xtiaq" targetRef="Event_1v65uss" />
+    <bpmn:serviceTask id="Activity_0eto9sg" name="Get Email of user">
+      <bpmn:extensionElements>
+        <spiffworkflow:serviceTaskOperator id="http/GetRequestV2" resultVariable="email">
+          <spiffworkflow:parameters>
+            <spiffworkflow:parameter id="url" type="str" value="&#34;https://run.mocky.io/v3/94846e48-9c7a-44ae-af0d-f883bbf2fa65&#34;" />
+            <spiffworkflow:parameter id="headers" type="any" value="{&#34;Accept&#34;:&#34;application/json&#34;}" />
+            <spiffworkflow:parameter id="params" type="any" />
+            <spiffworkflow:parameter id="basic_auth_username" type="str" />
+            <spiffworkflow:parameter id="basic_auth_password" type="str" />
+            <spiffworkflow:parameter id="attempts" type="int" />
+          </spiffworkflow:parameters>
+        </spiffworkflow:serviceTaskOperator>
+        <spiffworkflow:postScript>import json
+
+# Example JSON data
+data = email
+
+# Extract the email
+email = data["body"].get("email", "Email not found")</spiffworkflow:postScript>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kgbk7e</bpmn:incoming>
+      <bpmn:outgoing>Flow_05xft3m</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="Event_05o2417" name="New Inventory Item has been received">
+      <bpmn:outgoing>Flow_0kgbk7e</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0kgbk7e" sourceRef="Event_05o2417" targetRef="Activity_0eto9sg" />
+    <bpmn:sequenceFlow id="Flow_05xft3m" sourceRef="Activity_0eto9sg" targetRef="Activity_18eseli" />
+    <bpmn:scriptTask id="Activity_18eseli" name="Set user as lane owner">
+      <bpmn:incoming>Flow_05xft3m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ss8af6</bpmn:outgoing>
+      <bpmn:script>lane_owners = {"Inventorymanagement_administrator": [email]}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0ss8af6" sourceRef="Activity_18eseli" targetRef="Gateway_0eot73d" />
+    <bpmn:serviceTask id="Activity_1j23erl" name="Create QR-Code">
+      <bpmn:extensionElements>
+        <spiffworkflow:serviceTaskOperator id="http/PostRequestV2" resultVariable="QRcode">
+          <spiffworkflow:parameters>
+            <spiffworkflow:parameter id="url" type="str" value="&#34;https://webhook.site/326876b2-84e2-4a19-8382-32ba19769fb5&#34;" />
+            <spiffworkflow:parameter id="headers" type="any" value="{&#34;Content-Type&#34;:&#34;application/json&#34;}" />
+            <spiffworkflow:parameter id="data" type="any" value="{&#34;URN&#34;: URN }" />
+            <spiffworkflow:parameter id="basic_auth_username" type="str" />
+            <spiffworkflow:parameter id="basic_auth_password" type="str" />
+          </spiffworkflow:parameters>
+        </spiffworkflow:serviceTaskOperator>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1niwuiu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xm7hz4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0as6bqr" sourceRef="Activity_1h6buk5" targetRef="Gateway_0u9s1j2" />
+    <bpmn:manualTask id="Activity_11xtiaq" name="Stick on label">
+      <bpmn:incoming>Flow_01u5wrm</bpmn:incoming>
+      <bpmn:outgoing>Flow_13fc6m4</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:endEvent id="Event_1v65uss" name="Inventory successfully conducted">
+      <bpmn:incoming>Flow_13fc6m4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1niwuiu" sourceRef="Activity_165ddj9" targetRef="Activity_1j23erl" />
+    <bpmn:manualTask id="Activity_00butrr" name="Print QR code using a label printer">
+      <bpmn:incoming>Flow_1xm7hz4</bpmn:incoming>
+      <bpmn:outgoing>Flow_01u5wrm</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:sequenceFlow id="Flow_1xm7hz4" sourceRef="Activity_1j23erl" targetRef="Activity_00butrr" />
+    <bpmn:sequenceFlow id="Flow_01u5wrm" sourceRef="Activity_00butrr" targetRef="Activity_11xtiaq" />
+    <bpmn:serviceTask id="Activity_020k34f" name="Create URN">
+      <bpmn:extensionElements>
+        <spiffworkflow:serviceTaskOperator id="http/GetRequestV2" resultVariable="URN">
+          <spiffworkflow:parameters>
+            <spiffworkflow:parameter id="url" type="str" value="&#34;https://run.mocky.io/v3/94846e48-9c7a-44ae-af0d-f883bbf2fa65&#34;" />
+            <spiffworkflow:parameter id="headers" type="any" value="{&#34;Accept&#34;:&#34;application/json&#34;}" />
+            <spiffworkflow:parameter id="params" type="any" />
+            <spiffworkflow:parameter id="basic_auth_username" type="str" />
+            <spiffworkflow:parameter id="basic_auth_password" type="str" />
+            <spiffworkflow:parameter id="attempts" type="int" />
+          </spiffworkflow:parameters>
+        </spiffworkflow:serviceTaskOperator>
+        <spiffworkflow:postScript>import json
+
+# Example JSON data
+data = URN
+
+# Extract the email
+URN = data["body"].get("email", "Email not found")</spiffworkflow:postScript>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17gl2xq</bpmn:incoming>
+      <bpmn:outgoing>Flow_0khxs9o</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_17gl2xq" sourceRef="Gateway_0eot73d" targetRef="Activity_020k34f" />
+    <bpmn:parallelGateway id="Gateway_0eot73d">
+      <bpmn:incoming>Flow_0ss8af6</bpmn:incoming>
+      <bpmn:outgoing>Flow_17gl2xq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_06nd481</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_06nd481" sourceRef="Gateway_0eot73d" targetRef="Activity_1h6buk5" />
+    <bpmn:userTask id="Activity_1h6buk5" name="Enter name, select icon, and upload photo">
+      <bpmn:extensionElements>
+        <spiffworkflow:properties>
+          <spiffworkflow:property name="formJsonSchemaFilename" value="userinput-schema.json" />
+          <spiffworkflow:property name="formUiSchemaFilename" value="userinput-uischema.json" />
+        </spiffworkflow:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06nd481</bpmn:incoming>
+      <bpmn:outgoing>Flow_0as6bqr</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_12e61tl" sourceRef="Gateway_0u9s1j2" targetRef="Activity_165ddj9" />
+    <bpmn:sequenceFlow id="Flow_0khxs9o" sourceRef="Activity_020k34f" targetRef="Gateway_0u9s1j2" />
+    <bpmn:parallelGateway id="Gateway_0u9s1j2">
+      <bpmn:incoming>Flow_0as6bqr</bpmn:incoming>
+      <bpmn:incoming>Flow_0khxs9o</bpmn:incoming>
+      <bpmn:outgoing>Flow_12e61tl</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:association id="Association_1dvvdcn" associationDirection="None" sourceRef="DataObjectReference_1wsqa0r" targetRef="TextAnnotation_057vkw6" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0g4wcq3">
+      <bpmndi:BPMNShape id="Participant_0xfcgaf_di" bpmnElement="Participant_0xfcgaf" isHorizontal="true">
+        <dc:Bounds x="-115" y="-410" width="2280" height="900" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_04qn1ii_di" bpmnElement="Lane_04qn1ii" isHorizontal="true">
+        <dc:Bounds x="-85" y="-410" width="2250" height="190" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1mhlckx_di" bpmnElement="Lane_1mhlckx" isHorizontal="true">
+        <dc:Bounds x="-85" y="-220" width="2250" height="410" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_14jmm0k_di" bpmnElement="Lane_14jmm0k" isHorizontal="true">
+        <dc:Bounds x="-85" y="190" width="2250" height="300" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_1ea6fho_di" bpmnElement="DataObjectReference_1ea6fho">
+        <dc:Bounds x="512" y="-315" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488" y="-339" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_1nrkvgd_di" bpmnElement="DataObjectReference_1nrkvgd">
+        <dc:Bounds x="657" y="-315" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="646" y="-258" width="59" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_1wsqa0r_di" bpmnElement="DataObjectReference_1wsqa0r">
+        <dc:Bounds x="1822" y="-65" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1826" y="-87" width="28" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_0a2dh50_di" bpmnElement="DataObjectReference_0a2dh50">
+        <dc:Bounds x="1112" y="235" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1101" y="292" width="59" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_132lkqb_di" bpmnElement="DataObjectReference_132lkqb">
+        <dc:Bounds x="1437" y="-315" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1421" y="-345" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1x5e75b_di" bpmnElement="Activity_165ddj9">
+        <dc:Bounds x="1405" y="-70" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ohwu5j_di" bpmnElement="Activity_0eto9sg">
+        <dc:Bounds x="130" y="40" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_05o2417_di" bpmnElement="Event_05o2417">
+        <dc:Bounds x="-28" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-45" y="105" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1r29ur3_di" bpmnElement="Activity_18eseli">
+        <dc:Bounds x="130" y="310" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05mgr5y_di" bpmnElement="Activity_1j23erl">
+        <dc:Bounds x="1590" y="-70" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1co6hg4_di" bpmnElement="Activity_11xtiaq">
+        <dc:Bounds x="1780" y="270" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1v65uss_di" bpmnElement="Event_1v65uss">
+        <dc:Bounds x="1932" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1921" y="335" width="60" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_159ug4w_di" bpmnElement="Activity_00butrr">
+        <dc:Bounds x="1590" y="270" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1iual6d_di" bpmnElement="Activity_020k34f">
+        <dc:Bounds x="960" y="-70" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1g405vv_di" bpmnElement="Gateway_0eot73d">
+        <dc:Bounds x="535" y="325" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1es9k50_di" bpmnElement="Activity_1h6buk5">
+        <dc:Bounds x="960" y="310" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1pab3kv_di" bpmnElement="Gateway_0u9s1j2">
+        <dc:Bounds x="1255" y="-55" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_13fc6m4_di" bpmnElement="Flow_13fc6m4">
+        <di:waypoint x="1880" y="310" />
+        <di:waypoint x="1932" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kgbk7e_di" bpmnElement="Flow_0kgbk7e">
+        <di:waypoint x="8" y="80" />
+        <di:waypoint x="130" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05xft3m_di" bpmnElement="Flow_05xft3m">
+        <di:waypoint x="180" y="120" />
+        <di:waypoint x="180" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ss8af6_di" bpmnElement="Flow_0ss8af6">
+        <di:waypoint x="230" y="350" />
+        <di:waypoint x="535" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0as6bqr_di" bpmnElement="Flow_0as6bqr">
+        <di:waypoint x="1060" y="350" />
+        <di:waypoint x="1223" y="350" />
+        <di:waypoint x="1223" y="-30" />
+        <di:waypoint x="1255" y="-30" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1niwuiu_di" bpmnElement="Flow_1niwuiu">
+        <di:waypoint x="1505" y="-30" />
+        <di:waypoint x="1590" y="-30" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xm7hz4_di" bpmnElement="Flow_1xm7hz4">
+        <di:waypoint x="1640" y="10" />
+        <di:waypoint x="1640" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01u5wrm_di" bpmnElement="Flow_01u5wrm">
+        <di:waypoint x="1690" y="310" />
+        <di:waypoint x="1780" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17gl2xq_di" bpmnElement="Flow_17gl2xq">
+        <di:waypoint x="560" y="325" />
+        <di:waypoint x="560" y="-30" />
+        <di:waypoint x="960" y="-30" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06nd481_di" bpmnElement="Flow_06nd481">
+        <di:waypoint x="585" y="350" />
+        <di:waypoint x="960" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12e61tl_di" bpmnElement="Flow_12e61tl">
+        <di:waypoint x="1305" y="-30" />
+        <di:waypoint x="1405" y="-30" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0khxs9o_di" bpmnElement="Flow_0khxs9o">
+        <di:waypoint x="1060" y="-30" />
+        <di:waypoint x="1255" y="-30" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1dvvdcn_di" bpmnElement="Association_1dvvdcn">
+        <di:waypoint x="1823" y="-65" />
+        <di:waypoint x="1778" y="-130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1xkl9oj_di" bpmnElement="TextAnnotation_1xkl9oj">
+        <dc:Bounds x="740" y="-350" width="100" height="30" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_057vkw6_di" bpmnElement="TextAnnotation_057vkw6">
+        <dc:Bounds x="1720" y="-160" width="100" height="30" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_17fdgod_di" bpmnElement="TextAnnotation_17fdgod">
+        <dc:Bounds x="990" y="225" width="100" height="70" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0grdw1i_di" bpmnElement="TextAnnotation_0grdw1i">
+        <dc:Bounds x="1600" y="-360" width="100" height="70" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1v6s2co_di" bpmnElement="Association_1v6s2co">
+        <di:waypoint x="1112" y="256" />
+        <di:waypoint x="1090" y="251" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1kgce99_di" bpmnElement="Association_1kgce99">
+        <di:waypoint x="1473" y="-296" />
+        <di:waypoint x="1600" y="-329" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1t58e3g_di" bpmnElement="Association_1t58e3g">
+        <di:waypoint x="693" y="-297" />
+        <di:waypoint x="740" y="-322" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

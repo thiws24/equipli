@@ -1,49 +1,20 @@
 # InventoryService API
 
-Ermöglicht das Erstellen, Abrufen, Aktualisieren und Löschen von InventoryItems.
+Die InventoryService API ermöglicht das Verwalten von Kategorien und Items. Mit ihr können Kategorien und Items
+erstellt, abgerufen, aktualisiert und gelöscht werden.
 
 ---
 
-### Hinzufügen eines InventoryItems
+## Endpoints
 
-Fügt ein neues InventoryItem hinzu.
+### Kategorien
 
-```http
-POST /inventoryitems
-```
+#### Alle Kategorien abrufen
 
-#### Request Body
-
-```json
-{
-  "name": "Volleyball",
-  "photoUrl": "https://example.com/photo.jpg",
-  "icon": "🏐",
-  "urn": "example-urn"
-}
-```
-
-#### Response
-
-    Status 201 (Created): Das InventoryItem wurde erfolgreich erstellt.
-    Status 400 (Bad Request): Der Name des InventoryItems darf nicht leer sein.
-
-```json
-{
-  "id": 1,
-  "name": "Volleyball",
-  "photoUrl": "https://example.com/photo.jpg",
-  "icon": "🏐",
-  "urn": "example-urn"
-}
-```
-
----
-
-### Alle InventoryItems abrufen
+Gibt alle Kategorien zurück.
 
 ```http
-GET /inventoryitems
+GET /categories
 ```
 
 #### Response
@@ -54,96 +25,261 @@ GET /inventoryitems
 [
   {
     "id": 1,
-    "name": "Volleyball",
+    "name": "Beispielkategorie",
+    "description": "Eine Testkategorie",
+    "icon": "📦",
     "photoUrl": "https://example.com/photo.jpg",
-    "icon": "🏐",
-    "urn": "example-urn"
-  },
-  {
-    "id": 2,
-    "name": "Basketball",
-    "photoUrl": "https://example.com/photo.jpg",
-    "icon": "🏀",
-    "urn": "example-urn"
+    "items": []
   }
 ]
 ```
 
 ---
 
-### Einzelnes InventoryItem abrufen
+#### Kategorie erstellen
 
-Ruft ein spezifisches InventoryItem anhand seiner ID ab.
-
-```http
-GET /inventoryitems/{id}
-```
-
-#### Response
-
-    Status 200 (OK)
-    Status 404 (Not Found): InventoryItem nicht gefunden.
-
-```json
-{
-  "id": 1,
-  "name": "Volleyball",
-  "photoUrl": "https://example.com/photo.jpg",
-  "icon": "🏐",
-  "urn": "example-urn"
-}
-```
-
----
-
-### InventoryItem aktualisieren
-
-Aktualisiert ein bestehendes InventoryItem anhand seiner ID.
+Erstellt eine neue Kategorie.
 
 ```http
-PUT /inventoryitems/{id}
+POST /categories
 ```
 
 #### Request Body
 
 ```json
 {
-  "name": "Fußball",
-  "photoUrl": "https://example.com/newphoto.jpg",
-  "icon": "⚽️",
-  "urn": "new-urn"
+  "name": "Neue Kategorie",
+  "description": "Eine Beschreibung",
+  "icon": "📦",
+  "photoUrl": "https://example.com/photo.jpg",
+  "itemCount": 10,
+  "itemLocation": "Lager 1"
 }
 ```
 
 #### Response
 
-    Status 200 (OK): InventoryItem erfolgreich aktualisiert.
-    Status 404 (Not Found): InventoryItem nicht gefunden.
+    Status 201 (Created): Die Kategorie wurde erfolgreich erstellt.
+    Status 400 (Bad Request): Der Name der Kategorie existiert bereits oder ist leer.
+
+---
+
+#### Einzelne Kategorie abrufen
+
+Gibt eine spezifische Kategorie anhand ihrer ID zurück.
+
+```http
+GET /categories/{id}
+```
+
+#### Response
+
+    Status 200 (OK)
+    Status 404 (Not Found): Kategorie nicht gefunden.
 
 ```json
 {
   "id": 1,
-  "name": "Fußball",
-  "photoUrl": "https://example.com/newphoto.jpg",
-  "icon": "⚽️",
-  "urn": "new-urn"
+  "name": "Beispielkategorie",
+  "description": "Eine Testkategorie",
+  "icon": "📦",
+  "photoUrl": "https://example.com/photo.jpg",
+  "items": [
+    {
+      "id": 1,
+      "status": "OK",
+      "location": "Lager 1"
+    }
+  ]
 }
 ```
 
 ---
 
-### InventoryItem löschen
+#### Kategorie aktualisieren
 
-Löscht ein spezifisches InventoryItem anhand seiner ID.
+Aktualisiert eine bestehende Kategorie anhand ihrer ID.
 
 ```http
-DELETE /inventoryitems/{id}
+PUT /categories/{id}
+```
+
+#### Request Body
+
+```json
+{
+  "name": "Aktualisierte Kategorie",
+  "description": "Neue Beschreibung",
+  "icon": "✅",
+  "photoUrl": "https://example.com/newphoto.jpg"
+}
 ```
 
 #### Response
 
-    Status 204 (No Content): InventoryItem erfolgreich gelöscht.
-    Status 404 (Not Found): InventoryItem nicht gefunden.
+    Status 200 (OK): Kategorie erfolgreich aktualisiert.
+    Status 400 (Bad Request): Der Name der Kategorie existiert bereits oder ist leer.
+    Status 404 (Not Found): Kategorie nicht gefunden.
+
+```json
+{
+  "id": 1,
+  "name": "Aktualisierte Kategorie",
+  "description": "Neue Beschreibung",
+  "icon": "✅",
+  "photoUrl": "https://example.com/newphoto.jpg",
+  "items": []
+}
+```
+
+---
+
+#### Kategorie löschen
+
+Löscht eine spezifische Kategorie anhand ihrer ID.
+
+```http
+DELETE /categories/{id}
+```
+
+#### Response
+
+    Status 204 (No Content): Kategorie erfolgreich gelöscht.
+    Status 404 (Not Found): Kategorie nicht gefunden.
+
+---
+
+### Items
+
+#### Item erstellen
+
+Erstellt ein neues Item in einer Kategorie.
+
+```http
+POST /categories/{categoryId}/items
+```
+
+#### Request Body
+
+```json
+{
+  "status": "OK",
+  "location": "Lager 1"
+}
+```
+
+#### Response
+
+    Status 201 (Created): Das Item wurde erfolgreich erstellt.
+    Status 404 (Not Found): Kategorie nicht gefunden.
+
+```json
+{
+  "id": 1,
+  "status": "OK",
+  "location": "Lager 1"
+}
+```
+
+---
+
+#### Alle Items einer Kategorie abrufen
+
+Gibt alle Items einer Kategorie zurück.
+
+```http
+GET /categories/{categoryId}/items
+```
+
+#### Response
+
+    Status 200 (OK): Die Items wurden erfolgreich abgerufen.
+    Status 404 (Not Found): Kategorie nicht gefunden.
+
+```json
+[
+  {
+    "id": 1,
+    "status": "OK",
+    "location": "Regal 1"
+  },
+  {
+    "id": 2,
+    "status": "IN_MAINTENANCE",
+    "location": "Regal 2"
+  }
+]
+```
+
+---
+
+#### Einzelnes Item abrufen
+
+Gibt ein spezifisches Item anhand seiner ID zurück.
+
+```http
+GET /categories/{categoryId}/items/{itemId}
+```
+
+#### Response
+
+    Status 200 (OK)
+    Status 404 (Not Found): Item nicht gefunden.
+
+```json
+{
+  "id": 1,
+  "status": "OK",
+  "location": "Regal 1"
+}
+```
+
+---
+
+#### Item aktualisieren
+
+Aktualisiert ein spezifisches Item anhand seiner ID.
+
+```http
+PUT /categories/{categoryId}/items/{itemId}
+```
+
+#### Request Body
+
+```json
+{
+  "status": "IN_MAINTENANCE",
+  "location": "Regal 2"
+}
+```
+
+#### Response
+
+    Status 200 (OK): Item erfolgreich aktualisiert.
+    Status 404 (Not Found): Item nicht gefunden.
+
+```json
+{
+  "id": 1,
+  "status": "IN_MAINTENANCE",
+  "location": "Regal 2"
+}
+```
+
+---
+
+#### Item löschen
+
+Löscht ein spezifisches Item anhand seiner ID.
+
+```http
+DELETE /categories/{categoryId}/items/{itemId}
+```
+
+#### Response
+
+    Status 204 (No Content): Item erfolgreich gelöscht.
+    Status 404 (Not Found): Item nicht gefunden.
 
 ---
 
@@ -153,11 +289,11 @@ DELETE /inventoryitems/{id}
 
 Um den InventoryService mit einer Datenbank zu verbinden, müssen folgende Umgebungsvariablen gesetzt werden:
 
-| Variable                     | Beschreibung                   |
-|:-----------------------------|:-------------------------------|
-| QUARKUS_DATASOURCE_JDBC_URL  | JDBC-URL der Datenbank         |    
-| QUARKUS_DATASOURCE_USERNAME  | Benutzername für die Datenbank |      
-| QUARKUS_DATASOURCE_PASSWORD  | Passwort für die Datenbank     |
+| Variable                    | Beschreibung                   |
+|:----------------------------|:-------------------------------|
+| QUARKUS_DATASOURCE_JDBC_URL | JDBC-URL der Datenbank         |    
+| QUARKUS_DATASOURCE_USERNAME | Benutzername für die Datenbank |      
+| QUARKUS_DATASOURCE_PASSWORD | Passwort für die Datenbank     |
 
 ---
 
@@ -218,9 +354,13 @@ If you want to learn more about building native executables, please consult <htt
 
 ## Related Guides
 
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
+- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and
+  Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on
+  it.
+- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus
+  REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
+- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code
+  for Hibernate ORM via the active record or the repository pattern
 - JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
 
 ## Provided Code
@@ -232,7 +372,6 @@ Create your first JPA entity
 [Related guide section...](https://quarkus.io/guides/hibernate-orm)
 
 [Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
 
 ### REST
 

@@ -4,19 +4,23 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.time.LocalDate;
 
 @Entity
 public class Reservation extends PanacheEntity {
 
-    public Long itemId;
-    public Long userId;
-    public LocalDate startDate;
-    public LocalDate endDate;
+    @Schema(defaultValue = "1")
+    private Long itemId;
+    @Schema(defaultValue = "1")
+    private Long categoryId;
+    private String userId;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    public ReservationStatus status;
+    private ReservationStatus status;
 
     public Long getId() {
         return id;
@@ -30,11 +34,19 @@ public class Reservation extends PanacheEntity {
         this.itemId = itemId;
     }
 
-    public Long getUserId() {
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

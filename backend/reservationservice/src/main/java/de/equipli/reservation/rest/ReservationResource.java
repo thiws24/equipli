@@ -18,8 +18,12 @@ import java.util.List;
 @Path("/reservations")
 public class ReservationResource {
 
+    private final ReservationRepository reservationRepository;
+
     @Inject
-    ReservationRepository reservationRepository;
+    public ReservationResource(ReservationRepository reservationRepository) {
+        this.reservationRepository = reservationRepository;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -29,6 +33,22 @@ public class ReservationResource {
     })
     public List<Reservation> getReservations() {
         return reservationRepository.listAll();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get a reservation", description = "Returns a reservation by ID.")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200", description = "Reservation found", content = @Content(mediaType = "application/json")),
+            @APIResponse(responseCode = "404", description = "Reservation not found", content = @Content(mediaType = "text/plain"))
+    })
+    public Reservation getReservation(@PathParam("id") Long id) {
+        Reservation reservation = reservationRepository.findById(id);
+        if (reservation == null) {
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity("Reservation not found").build());
+        }
+        return reservation;
     }
 
     @POST
@@ -119,6 +139,23 @@ public class ReservationResource {
 
         reservationRepository.persist(existingReservation);
         return Response.ok(existingReservation).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    @Operation(summary = "Delete a reservation", description = "Deletes a reservation by ID.")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "204", description = "Reservation deleted"),
+            @APIResponse(responseCode = "404", description = "Reservation not found", content = @Content(mediaType = "text/plain"))
+    })
+    public Response deleteReservation(@PathParam("id") Long id) {
+        Reservation reservation = reservationRepository.findById(id);
+        if (reservation == null) {
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity("Reservation not found").build());
+        }
+        reservationRepository.delete(reservation);
+        return Response.noContent().build();
     }
 
 }

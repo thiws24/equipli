@@ -38,13 +38,13 @@ public class MailRoute extends RouteBuilder {
     String password;
 
     @Inject
-    ValidationProcessor validationProcessor;
+    public ValidationProcessor validationProcessor;
 
     @Inject
-    GetUserDataFromKeycloakProcessor getUserDataFromKeycloakProcessor;
+    public GetUserDataFromKeycloakProcessor getUserDataFromKeycloakProcessor;
 
     @Inject
-    GetItemToItemIdProcessor getItemToItemIdProcessor;
+    public GetItemToItemIdProcessor getItemToItemIdProcessor;
 
 
     @Override

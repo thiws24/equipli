@@ -17,8 +17,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.jboss.resteasy.reactive.RestForm;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -175,13 +175,15 @@ public class CategoryResource {
                 .build();
     }
 
-    // Minio
+
+    // Image upload/download endpoints
+
     @GET
     @Path("/{id}/image")
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a category image by ID", description = "Returns a category image by its ID as a Base64 string.")
     @APIResponses(value = {
-            @APIResponse(responseCode = "200", description = "Category photo returned successfully", content = @Content(mediaType = "text/plain")),
+            @APIResponse(responseCode = "200", description = "Category image returned successfully", content = @Content(mediaType = "text/plain")),
             @APIResponse(responseCode = "404", description = "Category not found", content = @Content(mediaType = "application/json"))
     })
     public Response getCategoryImage(@PathParam("id") Long id) {
@@ -214,34 +216,37 @@ public class CategoryResource {
 
     @POST
     @Path("/{id}/image")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
-    @Operation(summary = "Upload a category image by ID", description = "Uploads a category image by its ID as a Base64 string.")
+    @Operation(summary = "Upload a category image by ID", description = "Uploads a category image by its ID as a file.")
     @APIResponses(value = {
-            @APIResponse(responseCode = "201", description = "Category photo uploaded successfully"),
+            @APIResponse(responseCode = "201", description = "Category image uploaded successfully"),
             @APIResponse(responseCode = "404", description = "Category not found", content = @Content(mediaType = "application/json"))
     })
-    public Response uploadCategoryImage(@PathParam("id") Long id, String base64Image) {
+    public Response uploadCategoryImage(@PathParam("id") Long id, @RestForm InputStream fileContent, @RestForm String contentType) {
         Category category = categoryRepository.findById(id);
         if (category == null) {
             throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity("Category " + id + " not found").build());
         }
 
-        byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+        if (fileContent == null) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity("File content cannot be null").build());
+        }
 
-        try (InputStream photo = new ByteArrayInputStream(imageBytes)) {
+        try (InputStream image = fileContent) {
             minioClient.putObject(
                     io.minio.PutObjectArgs.builder()
                             .bucket(bucketName)
                             .object("category-" + id + ".jpg")
-                            .stream(photo, photo.available(), -1)
+                            .stream(image, image.available(), -1)
+                            .contentType(contentType)
                             .build()
             );
-            return Response.status(Response.Status.CREATED)
+            return Response.ok()
                     .header("Cache-Control", "no-cache, no-store, must-revalidate")
                     .build();
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new InternalServerErrorException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error uploading category photo").build());
+            throw new InternalServerErrorException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error uploading category image").build());
         }
     }
 }

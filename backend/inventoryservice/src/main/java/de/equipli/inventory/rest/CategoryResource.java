@@ -30,19 +30,18 @@ import java.util.Base64;
 @Path("/categories")
 public class CategoryResource {
 
-    @Inject
-    MinioClient minioClient;
+    private final CategoryRepository categoryRepository;
+    private final InventoryRepository inventoryRepository;
+    private final MinioClient minioClient;
 
     @ConfigProperty(name = "minio.bucket-name")
     String bucketName;
 
-    private final CategoryRepository categoryRepository;
-    private final InventoryRepository inventoryRepository;
-
     @Inject
-    public CategoryResource(CategoryRepository categoryRepository, InventoryRepository inventoryRepository) {
+    public CategoryResource(CategoryRepository categoryRepository, InventoryRepository inventoryRepository, MinioClient minioClient) {
         this.categoryRepository = categoryRepository;
         this.inventoryRepository = inventoryRepository;
+        this.minioClient = minioClient;
     }
 
     @POST
@@ -77,7 +76,7 @@ public class CategoryResource {
                 InventoryItem item = new InventoryItem();
                 item.setStatus(ItemStatus.OK);
 
-                if(request.getItemLocation() != null) {
+                if (request.getItemLocation() != null) {
                     item.setLocation(request.getItemLocation());
                 }
 
@@ -238,12 +237,11 @@ public class CategoryResource {
                             .stream(photo, photo.available(), -1)
                             .build()
             );
+            return Response.status(Response.Status.CREATED)
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    .build();
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             throw new InternalServerErrorException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error uploading category photo").build());
         }
-
-        return Response.status(Response.Status.CREATED)
-                .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                .build();
     }
 }

@@ -3,15 +3,11 @@ package de.equipli.inventory.rest;
 import de.equipli.inventory.jpa.*;
 import de.equipli.inventory.rest.dto.CreateCategoryRequest;
 import de.equipli.inventory.rest.dto.UpdateCategoryRequest;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.errors.MinioException;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -53,6 +49,7 @@ public class CategoryResource {
             @APIResponse(responseCode = "400", description = "Category name null or empty", content = @Content(mediaType = "application/json")),
             @APIResponse(responseCode = "400", description = "Category name already exists", content = @Content(mediaType = "application/json"))
     })
+    @RolesAllowed("user")
     public Response createCategory(CreateCategoryRequest request) {
         if (request.getName() == null || request.getName().isEmpty()) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity("Category name cannot be null or empty").build());
@@ -95,6 +92,7 @@ public class CategoryResource {
     @APIResponses(value = {
             @APIResponse(responseCode = "200", description = "Categories returned successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class)))
     })
+    @RolesAllowed("user")
     public Response getCategories() {
         return Response.ok(categoryRepository.listAll())
                 .header("Cache-Control", "max-age=300")
@@ -108,6 +106,7 @@ public class CategoryResource {
             @APIResponse(responseCode = "200", description = "Category returned successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
             @APIResponse(responseCode = "404", description = "Category not found", content = @Content(mediaType = "application/json"))
     })
+    @RolesAllowed("user")
     public Response getCategory(@PathParam("id") Long id) {
         Category category = categoryRepository.findById(id);
         if (category == null) {
@@ -128,6 +127,7 @@ public class CategoryResource {
             @APIResponse(responseCode = "404", description = "Category not found", content = @Content(mediaType = "application/json")),
             @APIResponse(responseCode = "400", description = "Category name already exists", content = @Content(mediaType = "application/json"))
     })
+    @RolesAllowed("user")
     public Response updateCategory(@PathParam("id") Long id, UpdateCategoryRequest request) {
         Category existingCategory = categoryRepository.findById(id);
         if (existingCategory == null) {
@@ -159,6 +159,7 @@ public class CategoryResource {
             @APIResponse(responseCode = "204", description = "Category deleted successfully"),
             @APIResponse(responseCode = "404", description = "Category not found", content = @Content(mediaType = "application/json"))
     })
+    @RolesAllowed("user")
     public Response deleteCategory(@PathParam("id") Long id) {
         Category category = categoryRepository.findById(id);
         if (category == null) {

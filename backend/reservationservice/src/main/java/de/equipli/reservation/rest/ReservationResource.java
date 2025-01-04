@@ -2,6 +2,7 @@ package de.equipli.reservation.rest;
 
 import de.equipli.reservation.jpa.ReservationRepository;
 import de.equipli.reservation.jpa.Reservation;
+import de.equipli.reservation.jpa.ReservationStatus;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -80,7 +81,7 @@ public class ReservationResource {
 
         List<Reservation> reservations = reservationRepository.findByItemId(reservation.getItemId());
         for (Reservation r : reservations) {
-            if (startDate.isBefore(r.getEndDate()) && endDate.isAfter(r.getStartDate())) {
+            if (r.getStatus() != null && !r.getStatus().equals(ReservationStatus.CANCELLED) && startDate.isBefore(r.getEndDate()) && endDate.isAfter(r.getStartDate())) {
                 throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity("Item is already reserved for this time slot").build());
             }
         }
